@@ -223,6 +223,29 @@ public:
    * \return true if HT capability support is enabled, false otherwise
    */
   bool HasHtSupported (void) const;
+
+
+
+
+//sampath
+ virtual void SetOwSupported (bool enable);
+  /**
+   * Return whether the device has HT capability support enabled.
+   *
+   * \return true if HT capability support is enabled, false otherwise
+   */
+  bool HasOwSupported (void) const;
+
+
+
+
+
+
+
+
+
+
+
   /**
    * Enable or disable VHT capability support.
    *
@@ -918,6 +941,25 @@ protected:
    *         false otherwise
    */
   bool GetHtSupported (const WifiRemoteStation *station) const;
+
+
+//sampath
+  bool GetOwSupported (const WifiRemoteStation *station) const;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   /**
    * Return whether the given station is VHT capable.
    *
@@ -1495,6 +1537,10 @@ private:
   bool m_htSupported;  //!< Flag if HT capability is supported
   bool m_vhtSupported; //!< Flag if VHT capability is supported
   bool m_heSupported;  //!< Flag if HE capability is supported
+
+  bool m_owSupported;//sampath
+
+
   uint32_t m_maxSsrc;  //!< Maximum STA short retry count (SSRC)
   uint32_t m_maxSlrc;  //!< Maximum STA long retry count (SLRC)
   uint32_t m_rtsCtsThreshold;  //!< Threshold for RTS/CTS
@@ -1575,6 +1621,8 @@ struct WifiRemoteStationState
   bool m_htSupported;         //!< Flag if HT is supported by the station
   bool m_vhtSupported;        //!< Flag if VHT is supported by the station
   bool m_heSupported;         //!< Flag if HE is supported by the station
+
+bool m_owSupported; //sampath
 };
 
 /**

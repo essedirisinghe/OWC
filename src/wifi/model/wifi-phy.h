@@ -872,7 +872,7 @@ public:
   static WifiMode GetOfdmRate13_5MbpsBW5MHz ();
 
 
-  static WifiMode GetOwcRate10Gbps ();
+  static WifiMode GetOwcRate10Gbps (); //sampath
   static WifiMode GetOwcRate1Gbps ();
 
 
@@ -1766,7 +1766,7 @@ private:
    */
 
 
-  void Configure80211ow (void);
+  void Configure80211ow (void); //sampath
 
 
 

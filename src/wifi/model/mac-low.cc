@@ -1026,6 +1026,7 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, bool
     }
   else if (hdr.GetAddr1 () == m_self)
     {
+      //std::cout<<"m_self"<<std::endl;
       m_stationManager->ReportRxOk (hdr.GetAddr2 (), &hdr,
                                     rxSnr, txVector.GetMode ());
       if (hdr.IsQosData () && ReceiveMpdu (packet, hdr))
@@ -1035,6 +1036,8 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, bool
              the Block Ack agreement exists, the recipient shall buffer the MSDU
              regardless of the value of the Ack Policy subfield within the
              QoS Control field of the QoS data frame. */
+//std::cout<<"m_self2 "<< hdr.IsQosAck ()<<"|" << !ampduSubframe<<"|"<<hdr.IsQosBlockAck ()<<std::endl;
+
           if (hdr.IsQosAck () && !ampduSubframe)
             {
               NS_LOG_DEBUG ("rx QoS unicast/sendAck from=" << hdr.GetAddr2 ());
@@ -1044,6 +1047,8 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, bool
                                                             hdr.GetAddr2 (), hdr.GetQosTid ());
               RxCompleteBufferedPacketsUntilFirstLost (hdr.GetAddr2 (), hdr.GetQosTid ());
               NS_ASSERT (m_sendAckEvent.IsExpired ());
+              //std::cout<<"header"<< hdr.GetDuration ()<<std::endl;
+              //std::cout<<"adr2"<< hdr.GetAddr2 ()<<std::endl;
               m_sendAckEvent = Simulator::Schedule (GetSifs (),
                                                     &MacLow::SendAckAfterData, this,
                                                     hdr.GetAddr2 (),
@@ -1051,12 +1056,14 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, bool
                                                     txVector.GetMode (),
                                                     rxSnr);
             }
+
           else if (hdr.IsQosBlockAck ())
             {
               AgreementsI it = m_bAckAgreements.find (std::make_pair (hdr.GetAddr2 (), hdr.GetQosTid ()));
               /* See section 11.5.3 in IEEE 802.11 for mean of this timer */
               ResetBlockAckInactivityTimerIfNeeded (it->second.first);
             }
+
           return;
         }
       else if (hdr.IsQosData () && hdr.IsQosBlockAck ())
@@ -1069,6 +1076,7 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, bool
              data MPDUs with the Ack Policy subfield set to Block Ack, it shall discard
              them and shall send a DELBA frame using the normal access
              mechanisms. */
+          
           AcIndex ac = QosUtilsMapTidToAc (hdr.GetQosTid ());
           m_edca[ac]->SendDelbaFrame (hdr.GetAddr2 (), hdr.GetQosTid (), false);
           return;
@@ -1149,6 +1157,7 @@ MacLow::ReceiveOk (Ptr<Packet> packet, double rxSnr, WifiTxVector txVector, bool
 rxPacket:
   WifiMacTrailer fcs;
   packet->RemoveTrailer (fcs);
+  //std::cout<<"called back"<<std::endl;
   m_rxCallback (packet, &hdr);
   return;
 }
@@ -1534,6 +1543,7 @@ MacLow::ForwardDown (Ptr<const Packet> packet, const WifiMacHeader* hdr, WifiTxV
           newHdr = dequeuedItem->GetHeader ();
           newPacket = dequeuedItem->GetPacket ()->Copy ();
           newHdr.SetDuration (hdr->GetDuration ());
+
           newPacket->AddHeader (newHdr);
           AddWifiMacTrailer (newPacket);
           if (queueSize == 1)
@@ -1836,25 +1846,30 @@ MacLow::SendDataPacket (void)
   if (m_txParams.HasDurationId ())
     {
       duration += m_txParams.GetDurationId ();
+
     }
   else
     {
+
       if (m_txParams.MustWaitBasicBlockAck ())
         {
           duration += GetSifs ();
           WifiTxVector blockAckReqTxVector = GetBlockAckTxVector (m_currentHdr.GetAddr2 (), m_currentTxVector.GetMode ());
           duration += GetBlockAckDuration (m_currentHdr.GetAddr1 (), blockAckReqTxVector, BASIC_BLOCK_ACK);
+//std::cout<<"MustWaitBasicBlockAck"<< duration<<std::endl;//sampath
         }
       else if (m_txParams.MustWaitCompressedBlockAck ())
         {
           duration += GetSifs ();
           WifiTxVector blockAckReqTxVector = GetBlockAckTxVector (m_currentHdr.GetAddr2 (), m_currentTxVector.GetMode ());
           duration += GetBlockAckDuration (m_currentHdr.GetAddr1 (), blockAckReqTxVector, COMPRESSED_BLOCK_ACK);
+//std::cout<<"MustWaitCompressedBlockAck"<< duration<<std::endl;//sampath
         }
       else if (m_txParams.MustWaitAck ())
         {
           duration += GetSifs ();
           duration += GetAckDuration (m_currentHdr.GetAddr1 (), m_currentTxVector);
+//std::cout<<"MustWaitAck"<< duration<<std::endl;//sampath
         }
       if (m_txParams.HasNextPacket ())
         {
@@ -1866,16 +1881,20 @@ MacLow::SendDataPacket (void)
             {
               duration += GetSifs ();
             }
+
           duration += m_phy->CalculateTxDuration (m_txParams.GetNextPacketSize (),
                                                   m_currentTxVector, m_phy->GetFrequency ());
+//std::cout<<"HasNextPacket"<< duration<<std::endl;//sampath
           if (m_txParams.MustWaitAck ())
             {
               duration += GetSifs ();
               duration += GetAckDuration (m_currentHdr.GetAddr1 (), m_currentTxVector);
+//std::cout<<"MustWaitAck2"<< duration<<std::endl;//sampath
             }
         }
     }
   m_currentHdr.SetDuration (duration);
+//std::cout<<"sed data packet"<< duration<<std::endl;//sampath
   Ptr <Packet> packet = m_currentPacket->Copy ();
   if (m_ampdu)
     {
@@ -2086,6 +2105,7 @@ MacLow::SendDataAfterCts (Mac48Address source, Time duration)
   duration = std::max (duration, newDuration);
   NS_ASSERT (duration.IsPositive ());
   m_currentHdr.SetDuration (duration);
+
   Ptr <Packet> packet = m_currentPacket->Copy ();
   if (m_ampdu)
     {
@@ -2171,7 +2191,8 @@ MacLow::IsInWindow (uint16_t seq, uint16_t winstart, uint16_t winsize) const
 bool
 MacLow::ReceiveMpdu (Ptr<Packet> packet, WifiMacHeader hdr)
 {
-  if (m_stationManager->HasHtSupported () || m_stationManager->HasVhtSupported ())
+  if (m_stationManager->HasHtSupported () || m_stationManager->HasVhtSupported () || m_stationManager->HasOwSupported ()) //sampath
+    //if (true)
     {
       Mac48Address originator = hdr.GetAddr2 ();
       uint8_t tid = 0;
@@ -2444,6 +2465,9 @@ MacLow::SendBlockAckResponse (const CtrlBAckResponseHeader* blockAck, Mac48Addre
 
   NS_ASSERT (duration.IsPositive ());
   hdr.SetDuration (duration);
+
+
+
   //here should be present a control about immediate or delayed block ack
   //for now we assume immediate
   packet->AddHeader (hdr);

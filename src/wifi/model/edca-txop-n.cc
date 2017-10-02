@@ -641,6 +641,7 @@ EdcaTxopN::MissedBlockAck (uint8_t nMpdus)
   if (GetAmpduExist (m_currentHdr.GetAddr1 ()))
     {
       m_stationManager->ReportAmpduTxStatus (m_currentHdr.GetAddr1 (), tid, 0, nMpdus, 0, 0);
+      
     }
   if (NeedBarRetransmission ())
     {
@@ -890,6 +891,7 @@ EdcaTxopN::StartNextPacket (void)
       m_fragmentNumber = 0;
       VerifyBlockAck ();
       GetLow ()->StartTransmission (m_currentPacket, &m_currentHdr, m_currentParams, this);
+//std::cout<<"duration "<<m_currentHdr.GetDuration() <<std::endl;
       if (!GetAmpduExist (m_currentHdr.GetAddr1 ()))
         {
           CompleteTx ();

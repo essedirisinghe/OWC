@@ -483,11 +483,11 @@ WifiMac::ConfigureDcf (Ptr<DcaTxop> dcf, uint32_t cwmin, uint32_t cwmax, bool is
       dcf->SetAifsn (2);
       if (isDsss)
         {
-          dcf->SetTxopLimit (MicroSeconds (3264));
+          dcf->SetTxopLimit (MicroSeconds (0));//3264 sampath
         }
       else
         {
-          dcf->SetTxopLimit (MicroSeconds (1504));
+          dcf->SetTxopLimit (MicroSeconds (0));//1504
         }
       break;
     case AC_VI:
@@ -496,11 +496,11 @@ WifiMac::ConfigureDcf (Ptr<DcaTxop> dcf, uint32_t cwmin, uint32_t cwmax, bool is
       dcf->SetAifsn (2);
       if (isDsss)
         {
-          dcf->SetTxopLimit (MicroSeconds (6016));
+          dcf->SetTxopLimit (MicroSeconds (0));//6016
         }
       else
         {
-          dcf->SetTxopLimit (MicroSeconds (3008));
+          dcf->SetTxopLimit (MicroSeconds (0));//3008
         }
       break;
     case AC_BE:

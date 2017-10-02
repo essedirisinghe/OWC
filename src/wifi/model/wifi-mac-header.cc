@@ -330,9 +330,9 @@ WifiMacHeader::SetRawDuration (uint16_t duration)
 void
 WifiMacHeader::SetDuration (Time duration)
 {
-  int64_t duration_us = ceil ((double)duration.GetNanoSeconds () / 1000);
+  int64_t duration_us = ceil ((double)duration.GetNanoSeconds ());// / 1000
   NS_ASSERT (duration_us >= 0 && duration_us <= 0x7fff);
-  m_duration = static_cast<uint16_t> (duration_us);
+  m_duration = static_cast<uint32_t> (duration_us); //uint32 sampath
 }
 
 void WifiMacHeader::SetId (uint16_t id)
@@ -736,7 +736,7 @@ WifiMacHeader::IsBlockAck (void) const
   return (GetType () == WIFI_MAC_CTL_BACKRESP) ? true : false;
 }
 
-uint16_t
+uint32_t
 WifiMacHeader::GetRawDuration (void) const
 {
   return m_duration;
@@ -745,7 +745,7 @@ WifiMacHeader::GetRawDuration (void) const
 Time
 WifiMacHeader::GetDuration (void) const
 {
-  return MicroSeconds (m_duration);
+  return NanoSeconds (m_duration);//sampath
 }
 
 uint16_t

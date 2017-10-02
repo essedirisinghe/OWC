@@ -403,6 +403,7 @@ WifiRemoteStationManager::WifiRemoteStationManager ()
     m_htSupported (false),
     m_vhtSupported (false),
     m_heSupported (false),
+    m_owSupported (false),//sampath
     m_useNonErpProtection (false),
     m_useNonHtProtection (false),
     m_useGreenfieldProtection (false),
@@ -468,6 +469,14 @@ WifiRemoteStationManager::SetHtSupported (bool enable)
 {
   m_htSupported = enable;
 }
+
+//sampath
+void
+WifiRemoteStationManager::SetOwSupported (bool enable)
+{
+  m_owSupported = enable;
+}
+
 
 void
 WifiRemoteStationManager::SetMaxSsrc (uint32_t maxSsrc)
@@ -568,6 +577,13 @@ bool
 WifiRemoteStationManager::HasHtSupported (void) const
 {
   return m_htSupported;
+}
+
+//sampath
+bool
+WifiRemoteStationManager::HasOwSupported (void) const
+{
+  return m_owSupported;
 }
 
 void
@@ -1031,6 +1047,7 @@ WifiRemoteStationManager::ReportAmpduTxStatus (Mac48Address address, uint8_t tid
       m_macTxDataFailed (address);
     }
   DoReportAmpduTxStatus (station, nSuccessfulMpdus, nFailedMpdus, rxSnr, dataSnr);
+  
 }
 
 bool
@@ -1677,6 +1694,8 @@ WifiRemoteStationManager::LookupState (Mac48Address address) const
   state->m_qosSupported = false;
   state->m_htSupported = false;
   state->m_vhtSupported = false;
+  state->m_owSupported = false;//sampath
+  
   state->m_heSupported = false;
   const_cast<WifiRemoteStationManager *> (this)->m_states.push_back (state);
   NS_LOG_DEBUG ("WifiRemoteStationManager::LookupState returning new state");
@@ -2115,6 +2134,14 @@ WifiRemoteStationManager::GetHtSupported (const WifiRemoteStation *station) cons
 {
   return station->m_state->m_htSupported;
 }
+
+//sampath
+bool
+WifiRemoteStationManager::GetOwSupported (const WifiRemoteStation *station) const
+{
+  return station->m_state->m_owSupported;
+}
+
 
 bool
 WifiRemoteStationManager::GetVhtSupported (const WifiRemoteStation *station) const

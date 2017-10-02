@@ -493,7 +493,7 @@ public:
    *
    * \return the raw duration from the Duration/ID field
    */
-  uint16_t GetRawDuration (void) const;
+  uint32_t GetRawDuration (void) const; //sampath
   /**
    * Return the duration from the Duration/ID field (Time object).
    *
@@ -648,7 +648,7 @@ private:
   uint8_t m_ctrlMoreData; ///< control more data
   uint8_t m_ctrlWep; ///< control WEP
   uint8_t m_ctrlOrder; ///< control order
-  uint16_t m_duration; ///< duration
+  uint32_t m_duration; ///< duration
   Mac48Address m_addr1; ///< address 1
   Mac48Address m_addr2; ///< address 2
   Mac48Address m_addr3; ///< address 3

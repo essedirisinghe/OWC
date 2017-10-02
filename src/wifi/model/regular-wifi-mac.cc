@@ -35,7 +35,8 @@ NS_LOG_COMPONENT_DEFINE ("RegularWifiMac");
 NS_OBJECT_ENSURE_REGISTERED (RegularWifiMac);
 
 RegularWifiMac::RegularWifiMac ()
-  : m_htSupported (0),
+  : m_owSupported (0), //sampath
+    m_htSupported (0),
     m_vhtSupported (0),
     m_erpSupported (0),
     m_dsssSupported (0),
@@ -124,6 +125,7 @@ RegularWifiMac::SetWifiRemoteStationManager (Ptr<WifiRemoteStationManager> stati
   m_stationManager->SetHtSupported (GetHtSupported ());
   m_stationManager->SetVhtSupported (GetVhtSupported ());
   m_stationManager->SetHeSupported (GetHeSupported ());
+  m_stationManager->SetOwSupported (GetOwSupported ());//sampath
   m_low->SetWifiRemoteStationManager (stationManager);
 
   m_dca->SetWifiRemoteStationManager (stationManager);
@@ -570,6 +572,33 @@ RegularWifiMac::SetHtSupported (bool enable)
     }
 }
 
+//sampath
+void
+RegularWifiMac::SetOwSupported (bool enable)
+{
+  NS_LOG_FUNCTION (this << enable);
+  m_owSupported = enable;
+  if (enable)
+    {
+      SetQosSupported (true);
+    }
+  if (!enable && !m_owSupported)
+    {
+      DisableAggregation ();
+    }
+  else
+    {
+      EnableAggregation ();
+    }
+}
+
+
+
+
+
+
+
+
 void
 RegularWifiMac::SetHeSupported (bool enable)
 {
@@ -588,6 +617,14 @@ RegularWifiMac::SetHeSupported (bool enable)
       EnableAggregation ();
     }
 }
+
+//sampath
+bool
+RegularWifiMac::GetOwSupported () const
+{
+  return m_owSupported;
+}
+
 
 bool
 RegularWifiMac::GetVhtSupported () const
@@ -1256,7 +1293,11 @@ RegularWifiMac::FinishConfigureStandard (WifiPhyStandard standard)
     case WIFI_PHY_STANDARD_80211a:
     case WIFI_PHY_STANDARD_80211_10MHZ:
     case WIFI_PHY_STANDARD_80211_5MHZ:
+      cwmin = 15;
+      cwmax = 1023;
+      break;
     case WIFI_PHY_STANDARD_80211ow:
+      SetOwSupported (true);
       cwmin = 15;
       cwmax = 1023;
       break;

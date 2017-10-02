@@ -478,6 +478,24 @@ protected:
     * state. Having a big switch seems like a good intermediate stage,
     * however.
     */
+
+
+
+
+  //sampath
+  bool m_owSupported;
+  void SetOwSupported (bool enable);
+  
+
+
+
+  bool GetOwSupported () const;
+
+
+
+
+
+
   bool m_htSupported;
 
   /**

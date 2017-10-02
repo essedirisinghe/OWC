@@ -152,7 +152,7 @@ WifiMode::GetDataRate (uint8_t channelWidth, uint16_t guardInterval, uint8_t nss
   uint32_t numberOfBitsPerSubcarrier = log2 (GetConstellationSize ());
   if (item->modClass == WIFI_MOD_CLASS_IR)
     {
-      dataRate = 10000000000;//100Mbps
+      dataRate = 10000000000;//10 Gbps //sampath
     }
   else if (item->modClass == WIFI_MOD_CLASS_DSSS)
     {
@@ -654,7 +654,7 @@ WifiMode::IsHigherDataRate (WifiMode mode) const
               return false;
             }
         }
-    case WIFI_MOD_CLASS_IR:
+    case WIFI_MOD_CLASS_IR: //sampath
       return false;
     default:
       NS_FATAL_ERROR ("Modulation class not defined");
